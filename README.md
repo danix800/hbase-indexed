@@ -11,13 +11,13 @@ coprocessors for a period of time, but no much progress has been
 made. This project is the product of my non-busy time.
 
 Features:
-	* 0.92 is supported
-	* region level index
-	* all index management hooked to coprocessors
-	* memstore not indexed
-	* inverted index on byte array
-	* index stored in HFile
-	* scan with Filter
+	0.92 is supported
+	region level index
+	all index management hooked to coprocessors
+	memstore not indexed
+	inverted index on byte array
+	index stored in HFile
+	scan with Filter
 
 So why this one while there are several choices?
 
