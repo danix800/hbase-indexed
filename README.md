@@ -52,7 +52,7 @@ on the index HFiles for speeding up.
 	Scan scan = new Scan();
 	Filter f1 = new SingleColumnValueFilter(fam1, qual1,
 			CompareOp.EQUAL, Bytes.toBytes(val1));
-	Filter f1 = new SingleColumnValueFilter(fam1, qual2,
+	Filter f2 = new SingleColumnValueFilter(fam1, qual2,
 			CompareOp.EQUAL, Bytes.toBytes(val2));
 	Filter f = new FilterList(Operator.MUST_PASS_ALL, f1, f2);
 	scan.setFilter(f);
