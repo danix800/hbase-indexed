@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2010 The Apache Software Foundation
  *
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -63,8 +63,8 @@ public class IndexDescriptor extends VersionedWritable {
 	private int offset = 0;
 
 	/**
-	 * Up-to where to grab the column qualifier's value. The default is all of it.
-	 * A positive number would indicate a set limit.
+	 * Up-to where to grab the column qualifier's value. The default is all of
+	 * it. A positive number would indicate a set limit.
 	 */
 	private int length = -1;
 
@@ -78,9 +78,9 @@ public class IndexDescriptor extends VersionedWritable {
 	 * Construct a new index descriptor.
 	 * 
 	 * @param qualifierName
-	 *          the qualifier name
+	 *            the qualifier name
 	 * @param indexType
-	 *          the qualifier type
+	 *            the qualifier type
 	 */
 	public IndexDescriptor(byte[] qualifierName) {
 		this.qualifierName = qualifierName;
@@ -99,7 +99,7 @@ public class IndexDescriptor extends VersionedWritable {
 	 * The column family qualifier name.
 	 * 
 	 * @param qualifierName
-	 *          column family qualifier name
+	 *            column family qualifier name
 	 */
 	public void setQualifierName(byte[] qualifierName) {
 		this.qualifierName = qualifierName;
@@ -118,7 +118,7 @@ public class IndexDescriptor extends VersionedWritable {
 	 * Sets the offset
 	 * 
 	 * @param offset
-	 *          the offset from which to extract the values.
+	 *            the offset from which to extract the values.
 	 */
 	public void setOffset(int offset) {
 		this.offset = offset;
@@ -137,7 +137,7 @@ public class IndexDescriptor extends VersionedWritable {
 	 * The length of the extracted value.
 	 * 
 	 * @param length
-	 *          the length of the extracted value.
+	 *            the length of the extracted value.
 	 */
 	public void setLength(int length) {
 		this.length = length;

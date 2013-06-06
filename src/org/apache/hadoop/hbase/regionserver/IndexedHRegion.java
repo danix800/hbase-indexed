@@ -1,3 +1,22 @@
+/*
+ * Copyright 2010 The Apache Software Foundation
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.hadoop.hbase.regionserver;
 
 import java.io.IOException;
@@ -56,7 +75,8 @@ public class IndexedHRegion extends HRegion {
 		numberOfOngoingIndexedScans = new AtomicInteger(0);
 		totalIndexedScans = new AtomicLong(0);
 		try {
-			Field field = region.getClass().getDeclaredField("scannerReadPoints");
+			Field field = region.getClass().getDeclaredField(
+					"scannerReadPoints");
 			field.setAccessible(true);
 			this.scannerReadPoints = (ConcurrentHashMap<RegionScanner, Long>) field
 					.get(region);
@@ -77,8 +97,8 @@ public class IndexedHRegion extends HRegion {
 	public RegionScanner instantiateRegionScanner(Scan scan,
 			IndexScannerContext indexScannerContext) throws IOException {
 		List<KeyValueScanner> scanners = new ArrayList<KeyValueScanner>();
-		for (Map.Entry<byte[], NavigableSet<byte[]>> entry : scan.getFamilyMap()
-				.entrySet()) {
+		for (Map.Entry<byte[], NavigableSet<byte[]>> entry : scan
+				.getFamilyMap().entrySet()) {
 			Store store = region.getStores().get(entry.getKey());
 			StoreScanner scanner = store.getScanner(scan, entry.getValue());
 			scanners.add(scanner);
@@ -104,8 +124,8 @@ public class IndexedHRegion extends HRegion {
 
 		kvs.addAll(sfScanners);
 		List<KeyValueScanner> scanners = new ArrayList<KeyValueScanner>();
-		scanners.add(new StoreScanner(scan, new byte[] {}, Long.MAX_VALUE, region
-				.getRegionInfo().getComparator(), null, kvs));
+		scanners.add(new StoreScanner(scan, new byte[] {}, Long.MAX_VALUE,
+				region.getRegionInfo().getComparator(), null, kvs));
 		return new IndexedRegionScanner(scan, scanners, null);
 	}
 
@@ -118,12 +138,12 @@ public class IndexedHRegion extends HRegion {
 	public InternalScanner createCollectionBackedScanner(List<KeyValue> kvs)
 			throws IOException {
 		List<? extends KeyValueScanner> cbs = Collections
-				.singletonList(new CollectionBackedScanner(kvs, region.getRegionInfo()
-						.getComparator()));
+				.singletonList(new CollectionBackedScanner(kvs, region
+						.getRegionInfo().getComparator()));
 		Scan scan = new Scan();
 		StoreScanner scanner = new IndexedStoreScanner(scan, new byte[] {},
-				Integer.MAX_VALUE, region.getRegionInfo().getComparator(), null,
-				new ArrayList<KeyValueScanner>(cbs));
+				Integer.MAX_VALUE, region.getRegionInfo().getComparator(),
+				null, new ArrayList<KeyValueScanner>(cbs));
 		return scanner;
 	}
 
@@ -142,8 +162,8 @@ public class IndexedHRegion extends HRegion {
 			List<KeyValueScanner> memstoreScanners = getMemstoreScanners(store,
 					scan.getStartRow());
 			StoreScanner scanner = new IndexedStoreScanner(scan, new byte[] {},
-					Integer.MAX_VALUE, region.getRegionInfo().getComparator(), scan
-							.getFamilyMap().get(family), memstoreScanners);
+					Integer.MAX_VALUE, region.getRegionInfo().getComparator(),
+					scan.getFamilyMap().get(family), memstoreScanners);
 			scanners.add(scanner);
 		}
 		return new IndexedRegionScanner(scan, scanners, null);
@@ -152,10 +172,10 @@ public class IndexedHRegion extends HRegion {
 	private class IndexedStoreScanner extends StoreScanner {
 		public IndexedStoreScanner(final Scan scan, final byte[] colFamily,
 				final long ttl, final KeyValue.KVComparator comparator,
-				final NavigableSet<byte[]> columns, final List<KeyValueScanner> scanners)
-				throws IOException {
-			super(scan, new byte[] {}, Integer.MAX_VALUE, region.getRegionInfo()
-					.getComparator(), columns, scanners);
+				final NavigableSet<byte[]> columns,
+				final List<KeyValueScanner> scanners) throws IOException {
+			super(scan, new byte[] {}, Integer.MAX_VALUE, region
+					.getRegionInfo().getComparator(), columns, scanners);
 			try {
 				Field field = StoreScanner.class.getDeclaredField("matcher");
 				field.setAccessible(true);
@@ -167,8 +187,8 @@ public class IndexedHRegion extends HRegion {
 		}
 	}
 
-	private List<KeyValueScanner> getMemstoreScanners(Store store, byte[] startRow)
-			throws IOException {
+	private List<KeyValueScanner> getMemstoreScanners(Store store,
+			byte[] startRow) throws IOException {
 		List<KeyValueScanner> scanners = new ArrayList<KeyValueScanner>();
 		List<KeyValueScanner> memstoreScanners = store.memstore.getScanners();
 		KeyValue seekTo = KeyValue.createFirstOnRow(startRow);
@@ -233,17 +253,19 @@ public class IndexedHRegion extends HRegion {
 
 	StoreFile completeCompaction(Store store,
 			final Collection<StoreFile> compactedFiles,
-			final StoreFile.Writer compactedFile, byte[] col) throws IOException {
+			final StoreFile.Writer compactedFile, byte[] col)
+			throws IOException {
 		StoreFile result = null;
 		if (compactedFile != null) {
 			Path origPath = compactedFile.getPath();
-			Path destPath = new Path(store.getHomedir(), IndexManagerImpl.INDEX_DIR
-					+ "/" + Bytes.toString(col) + "/" + origPath.getName());
+			Path destPath = new Path(store.getHomedir(),
+					IndexManagerImpl.INDEX_DIR + "/" + Bytes.toString(col)
+							+ "/" + origPath.getName());
 			if (!getFilesystem().rename(origPath, destPath)) {
 				LOG.error("Failed move of compacted file " + origPath + " to "
 						+ destPath);
-				throw new IOException("Failed move of compacted file " + origPath
-						+ " to " + destPath);
+				throw new IOException("Failed move of compacted file "
+						+ origPath + " to " + destPath);
 			}
 			result = new StoreFile(getFilesystem(), destPath, getConf(),
 					store.cacheConf, BloomType.NONE);
@@ -265,16 +287,17 @@ public class IndexedHRegion extends HRegion {
 			try {
 				Scan scan = new Scan();
 				scan.setMaxVersions(Integer.MAX_VALUE);
-				scanner = new StoreScanner(scan, new byte[] {}, Integer.MAX_VALUE,
-						region.getRegionInfo().getComparator(), null, kvscanner);
+				scanner = new StoreScanner(scan, new byte[] {},
+						Integer.MAX_VALUE, region.getRegionInfo()
+								.getComparator(), null, kvscanner);
 				ArrayList<KeyValue> kvs = new ArrayList<KeyValue>();
 				boolean hasMore;
 				do {
 					hasMore = scanner.next(kvs, 10);
 					if (writer == null && !kvs.isEmpty()) {
 						writer = StoreFile.createWriter(region.getFilesystem(),
-								region.getTmpDir(), HFile.DEFAULT_BLOCKSIZE, region.getConf(),
-								store.getCacheConfig());
+								region.getTmpDir(), HFile.DEFAULT_BLOCKSIZE,
+								region.getConf(), store.getCacheConfig());
 					}
 					if (writer != null) {
 						for (KeyValue kv : kvs) {
@@ -354,7 +377,8 @@ public class IndexedHRegion extends HRegion {
 			return region.getRegionInfo();
 		}
 
-		IndexedRegionScanner(Scan scan, List<KeyValueScanner> additionalScanners,
+		IndexedRegionScanner(Scan scan,
+				List<KeyValueScanner> additionalScanners,
 				IndexScannerContext indexScannerContext) throws IOException {
 			this.filter = scan.getFilter();
 			this.batch = scan.getBatch();
@@ -422,9 +446,10 @@ public class IndexedHRegion extends HRegion {
 		public synchronized boolean next(List<KeyValue> outResults, int limit)
 				throws IOException {
 			if (this.filterClosed) {
-				throw new UnknownScannerException("Scanner was closed (timed out?) "
-						+ "after we renewed it. Could be caused by a very slow scanner "
-						+ "or a lengthy garbage collection");
+				throw new UnknownScannerException(
+						"Scanner was closed (timed out?) "
+								+ "after we renewed it. Could be caused by a very slow scanner "
+								+ "or a lengthy garbage collection");
 			}
 			startRegionOperation();
 			region.readRequestsCount.increment();
@@ -476,8 +501,8 @@ public class IndexedHRegion extends HRegion {
 					|| (stopRow != null && region
 							.getRegionInfo()
 							.getComparator()
-							.compareRows(stopRow, 0, stopRow.length, currentRow, 0,
-									currentRow.length) <= isScan);
+							.compareRows(stopRow, 0, stopRow.length,
+									currentRow, 0, currentRow.length) <= isScan);
 		}
 
 		protected void seekNext() throws IOException {
@@ -492,7 +517,8 @@ public class IndexedHRegion extends HRegion {
 				} else if (lastKeyValue == null) {
 					break;
 				} else {
-					int comparisonResult = region.getRegionInfo().getComparator()
+					int comparisonResult = region.getRegionInfo()
+							.getComparator()
 							.compareRows(keyValue, lastKeyValue);
 					if (comparisonResult > 0) {
 						break;
@@ -624,7 +650,8 @@ public class IndexedHRegion extends HRegion {
 				Store store = region.getStores().get(family);
 				scanners.addAll(getMemstoreScanners(store, scan.getStartRow()));
 			}
-			return new KeyValueHeap(scanners, region.getRegionInfo().getComparator());
+			return new KeyValueHeap(scanners, region.getRegionInfo()
+					.getComparator());
 		}
 
 		public KeyValue next() throws IOException {

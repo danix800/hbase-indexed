@@ -1,3 +1,22 @@
+/*
+ * Copyright 2010 The Apache Software Foundation
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.hadoop.hbase.regionserver.indexed;
 
 import java.io.IOException;
@@ -59,8 +78,8 @@ public class IndexFilterEvaluator {
 				if (result == null) {
 					result = childResult;
 				} else if (childResult != null) {
-					result = (ArrayList<KeyValue>) CollectionUtils.intersection(result,
-							childResult);
+					result = (ArrayList<KeyValue>) CollectionUtils
+							.intersection(result, childResult);
 				}
 			}
 		} else if (filterList.getOperator() == FilterList.Operator.MUST_PASS_ONE) {
@@ -69,8 +88,8 @@ public class IndexFilterEvaluator {
 				if (result == null) {
 					result = childResult;
 				} else if (childResult != null) {
-					result = (ArrayList<KeyValue>) CollectionUtils.union(result,
-							childResult);
+					result = (ArrayList<KeyValue>) CollectionUtils.union(
+							result, childResult);
 				}
 			}
 		}
@@ -82,7 +101,8 @@ public class IndexFilterEvaluator {
 		List<StoreFile> sfs = indexMap.get(new Pair(singleColumnValueFilter
 				.getFamily(), singleColumnValueFilter.getQualifier()));
 		if (sfs == null) {
-			LOG.info(String.format("No index for column: '%s', qualifier: '%s'",
+			LOG.info(String.format(
+					"No index for column: '%s', qualifier: '%s'",
 					Bytes.toString(singleColumnValueFilter.getFamily()),
 					Bytes.toString(singleColumnValueFilter.getQualifier())));
 			return null;
@@ -96,8 +116,8 @@ public class IndexFilterEvaluator {
 		switch (singleColumnValueFilter.getOperator()) {
 		case EQUAL:
 			if (comparator instanceof BinaryPrefixComparator) {
-				scan = new Scan(value, IndexedTableUtils.incrementAtIndex(value,
-						value.length - 1));
+				scan = new Scan(value, IndexedTableUtils.incrementAtIndex(
+						value, value.length - 1));
 				// } else if (comparator instanceof RegexStringComparator) {
 				// scan = new Scan();
 				// scan.setFilter(new RowFilter(CompareOp.EQUAL, comparator));
@@ -128,8 +148,8 @@ public class IndexFilterEvaluator {
 			break;
 		}
 		scan.setMaxVersions();
-		InternalScanner scanner = region
-				.instantiateIndexStoreFileScanner(sfs, scan);
+		InternalScanner scanner = region.instantiateIndexStoreFileScanner(sfs,
+				scan);
 		List<KeyValue> matched = new ArrayList<KeyValue>();
 		List<KeyValue> nextRows = new ArrayList<KeyValue>();
 		boolean moreRows;
